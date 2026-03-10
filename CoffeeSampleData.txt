@@ -1,0 +1,20 @@
+﻿1000001-Espresso-Small-5-2.50-no-no
+1000002-Cappuccino-Medium-120-4.50-yes-no
+1000003-Latte-Large-200-5.25-yes-no
+1000004-Mocha-Medium-250-5.75-yes-no
+1000005-Americano-Small-15-2.75-no-no
+1000006-Flat White-Large-180-5.00-yes-no
+1000007-Macchiato-Small-10-3.00-no-no
+1000008-Black Coffee-Medium-5-2.00-no-no
+1000009-Vanilla Latte-Large-220-5.50-yes-no
+1000010-Caramel Macchiato-Medium-230-5.75-yes-no
+1000011-Hazelnut Latte-Large-210-5.60-yes-no
+1000012-Iced Coffee-Medium-90-3.50-no-no
+1000013-Iced Latte-Large-200-5.25-yes-no
+1000014-Ristretto-Small-5-2.50-no-no
+1000015-Flat Mocha-Medium-240-5.80-yes-no
+1000016-Double Espresso-Small-10-3.25-no-no
+1000017-Dirty Chai-Large-270-5.95-yes-no
+1000018-Matcha Latte-Medium-180-5.50-yes-no
+1000019-Black Eye-Small-15-3.00-no-no
+1000020-Affogato-Large-300-6.25-yes-no
