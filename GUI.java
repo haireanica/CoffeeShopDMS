@@ -5,13 +5,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class GUI {
 
-//global variable to set styles
+    //global variable to set styles
     Font titleFont = new Font("Cinzel Decorative", Font.BOLD, 45);
     Font textFont = new Font("Gill Sans", Font.PLAIN, 15);
     Font buttonFont = new Font("Gill Sans", Font.PLAIN, 20);
@@ -32,36 +32,32 @@ public class GUI {
     JFrame frame = new JFrame();
     DefaultTableModel model;
     JTable coffeeTable;
+    CoffeeDB coffeeDB = new CoffeeDB();
+    Connection connection;
 
     //gridBagConstraint Object
     GridBagConstraints c = new GridBagConstraints();
 
     //method to reset constraints
     public GridBagConstraints cReset(GridBagConstraints c){
-    c.gridx = 0;
-    c.gridy = 0;
-    c.gridwidth = 1;
-    c.gridheight = 1;
-    c.fill = GridBagConstraints.NONE;
-    c.weightx = 1.0;
-    c.weighty = 1.0;
-    c.anchor = GridBagConstraints.CENTER;
-    c.insets = new Insets(0, 0, 0, 0);
-    c.ipady = 0;
-    c.ipadx = 0;
-    return c;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.anchor = GridBagConstraints.CENTER;
+        c.insets = new Insets(0, 0, 0, 0);
+        c.ipady = 0;
+        c.ipadx = 0;
+        return c;
     }
 
     //method to create JTable with coffee object data
     public JTable makeTable(){
-        String [] columns = new String [] {"ID", "Name", "Size", "Calories","Price($)","Dairy", "Decaf"};
-        model = new DefaultTableModel(columns, 0){
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        coffeeTable = new JTable(model);
+
+        coffeeTable = new JTable();
         coffeeTable.getTableHeader().setFont(tableTopFont);
         coffeeTable.getTableHeader().setForeground(backgroundColor);
         coffeeTable.setRowHeight(20);
@@ -70,37 +66,22 @@ public class GUI {
         coffeeTable.setGridColor(Color.GRAY);
         coffeeTable.setForeground(backgroundColor);
         coffeeTable.setBackground(new Color(195, 176, 251, 255));
-        for(Coffee c: coffeeMenu.coffees){
-            model.addRow(new Object[]{
-                    c.getDrinkID(),
-                    c.getName(),
-                    c.getSize(),
-                    c.getCalories(),
-                    c.getPrice(),
-                    c.getDairy(),
-                    c.getDecaf()
-            });
+        if(connection != null) {
+            coffeeTable.setModel(coffeeDB.selectCoffeeTable());
         }
-        refreshTable();
         return coffeeTable;
     }
 
     //method to update/refresh table
     public void refreshTable() {
-        model.setRowCount(0); // clear table
-
-        for (Coffee c : coffeeMenu.coffees) {
-            model.addRow(new Object[]{
-                    c.getDrinkID(),
-                    c.getName(),
-                    c.getSize(),
-                    c.getCalories(),
-                    c.getPrice(),
-                    c.getDairy(),
-                    c.getDecaf()
-            });
+        if(connection != null) {
+            //getting table from database
+            coffeeTable.setModel(coffeeDB.selectCoffeeTable());
+            coffeeTable.revalidate();
+            coffeeTable.repaint();
         }
     }
+
     //method to create add coffee popup window
     public void addPopup(JFrame parentFrame){
         JDialog addDialog = new JDialog(parentFrame, "Add Coffee", true);
@@ -236,7 +217,7 @@ public class GUI {
         addForm.add(addSize, c);
         cReset(c);
 
-        JComboBox sizeBox = new JComboBox(new String[] {"Select size","small", "medium", "large"});
+        JComboBox sizeBox = new JComboBox(new String[] {"Select size","Small", "Medium", "Large"});
         c.gridx = 1;
         c.gridy = 4;
         c.anchor = GridBagConstraints.WEST;
@@ -302,7 +283,10 @@ public class GUI {
                 String calories = caloriesField.getText();
                 String price = priceField.getText();
                 errorLabel.setText(" ");
-                if (updateIDField.getText().isBlank()){
+                if(connection == null){
+                    errorLabel.setText("No connection Database ");
+                }
+                else if (updateIDField.getText().isBlank()){
                     errorLabel.setText("ID cannot be blank");
                 }
                 else if(updateIDField.getText().length()!=7){
@@ -311,7 +295,7 @@ public class GUI {
                 else if (!input.matches("\\d+")){
                     errorLabel.setText("ID must be all numbers, and positive");
                 }
-                else if(coffeeMenu.CheckID(input)){
+                else if(coffeeDB.isDuplicate(input)){
                     errorLabel.setText("Coffee already exists");
                 }
                 else if (nameField.getText().isBlank()){
@@ -324,7 +308,7 @@ public class GUI {
                     errorLabel.setText("Calories cannot be empty");
                 }
                 else if (!calories.matches("\\d+")){
-                        errorLabel.setText("calories must be all numbers, and positive");
+                    errorLabel.setText("calories must be all numbers, and positive");
                 }
                 else if (priceField.getText().isBlank()) {
                     errorLabel.setText("Price cannot be blank");
@@ -343,12 +327,12 @@ public class GUI {
                             dairyBox.isSelected(),
                             decafBox.isSelected()
                     );
-                    coffeeMenu.addCoffee(coffee);
+                   coffeeDB.addRow(coffee);
                     refreshTable();
                     addDialog.dispose();
                 }
-        }
-                                    });
+            }
+        });
 
         JButton clear = new JButton("Clear");
         c.gridx = 1;
@@ -519,7 +503,7 @@ public class GUI {
         updateForm.add(addSize, c);
         cReset(c);
 
-        JComboBox sizeBox = new JComboBox(new String[] {"Select size","small", "medium", "large"});
+        JComboBox sizeBox = new JComboBox(new String[] {"Select size","Small", "Medium", "Large"});
         sizeBox.setSelectedItem(coffee.getSize());
         c.gridx = 1;
         c.gridy = 4;
@@ -585,60 +569,49 @@ public class GUI {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            //casting inputs to string for validation
-            String input = updateIDField.getText();
-            String calories = caloriesField.getText();
-            String price = priceField.getText();
-            //row selected from table
-            int row = coffeeTable.getSelectedRow();
-            //variable to check against selected row
-            boolean sameItem = false;
-            //array list to store duplicate object to check if input and object from table are the same to help with validation
-            ArrayList<Coffee> tempList = new ArrayList<>();
-            for(Coffee c: coffeeMenu.coffees){
-                tempList.add(c);
-            }
-            //checking if object from tempList and object from input are the same
-            if(String.valueOf(tempList.get(row).getDrinkID()).equals(String.valueOf(input))){
-                sameItem = true;
-                }
-
-
+                //casting inputs to string for validation
+                String input = updateIDField.getText();
+                String calories = caloriesField.getText();
+                String price = priceField.getText();
+                //row selected from table
+                int row = coffeeTable.getSelectedRow();
+                //delete coffee from database
+                coffeeDB.deleteRow(coffee.getDrinkID());
                 //initially invisible error label to change what message is displayed to user
                 errorLabel.setText(" ");
-            //validation error messages
+                //validation error messages
                 if (updateIDField.getText().isBlank()){
-                errorLabel.setText("ID cannot be blank");
-            }
+                    errorLabel.setText("ID cannot be blank");
+                }
                 else if(updateIDField.getText().length()!=7){
-                errorLabel.setText("ID must be 7 digits");
-            }
+                    errorLabel.setText("ID must be 7 digits");
+                }
                 else if (!input.matches("\\d+")){
-                errorLabel.setText("ID must be all numbers, and positive");
-            }
-                else if(coffeeMenu.CheckID(input) && !sameItem){
-                errorLabel.setText("Coffee already exists");
-            }
+                    errorLabel.setText("ID must be all numbers, and positive");
+                }
+                else if(coffeeDB.isDuplicate(input)){
+                    errorLabel.setText("Coffee already exists");
+                }
                 else if (nameField.getText().isBlank()){
-                errorLabel.setText("Name cannot be blank");
-            }
+                    errorLabel.setText("Name cannot be blank");
+                }
                 else if(sizeBox.getSelectedIndex()==0){
-                errorLabel.setText("Size cannot be empty");
-            }
+                    errorLabel.setText("Size cannot be empty");
+                }
                 else if(caloriesField.getText().isBlank()) {
-                errorLabel.setText("Calories cannot be empty");
-            }
+                    errorLabel.setText("Calories cannot be empty");
+                }
                 else if (!calories.matches("\\d+")){
-                errorLabel.setText("calories must be all numbers, and positive");
-            }
+                    errorLabel.setText("calories must be all numbers, and positive");
+                }
                 else if (priceField.getText().isBlank()) {
-                errorLabel.setText("Price cannot be blank");
-            }
+                    errorLabel.setText("Price cannot be blank");
+                }
                 else if (!price.matches("\\d+(\\.\\d+)?")){
-                errorLabel.setText("price must be all numbers, and positive");
-            }
+                    errorLabel.setText("price must be all numbers, and positive");
+                }
                 //if all validation passes update fields with input data
-            else {
+                else {
                     coffee.setDrinkID(updateIDField.getText());
                     coffee.setName(nameField.getText());
                     coffee.setSize(sizeBox.getSelectedItem().toString());
@@ -646,10 +619,11 @@ public class GUI {
                     coffee.setPrice(Double.parseDouble(priceField.getText()));
                     coffee.setDairy(dairyBox.isSelected());
                     coffee.setDecaf(decafBox.isSelected());
+                    coffeeDB.addRow(coffee);
                     refreshTable();
                     updateDialog.dispose();
                 }
-        }});
+            }});
         //button to clear all fields back to selected
         JButton clear = new JButton("Clear");
         c.gridx = 1;
@@ -661,11 +635,11 @@ public class GUI {
             nameField.setText(coffee.getName());
             caloriesField.setText(String.valueOf(coffee.getCalories()));
             priceField.setText(String.valueOf(coffee.getPrice()));
-            if(coffee.getSize().equals("small")){
+            if(coffee.getSize().equals("Small")){
                 sizeBox.setSelectedIndex(1);
-            }else if(coffee.getSize().equals("medium")){
+            }else if(coffee.getSize().equals("Medium")){
                 sizeBox.setSelectedIndex(2);
-            } else if(coffee.getSize().equals("large")){
+            } else if(coffee.getSize().equals("Lƒarge")){
                 sizeBox.setSelectedIndex(3);
             }
             if (coffee.getDairy()){
@@ -840,9 +814,9 @@ public class GUI {
         saleButton.addActionListener(e -> {
             int percent = saleSlider.getValue();
 
-            double newPrice = originalPrice * (1 - (percent / 100.0));
+          //  double newPrice = originalPrice * (1 - (percent / 100.0));
 
-            coffee.setPrice(coffeeMenu.onSale(coffee, percent));
+           coffeeDB.dbSale(coffee,percent);
 
             reload(parentFrame);
             updateDialog.dispose();
@@ -877,7 +851,7 @@ public class GUI {
         // Create the file chooser
         JFileChooser fileChooser = new JFileChooser();
         //filtering to only allow text files
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Only '.txt' files allowed", "txt");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Only '.db' files allowed", "db");
         fileChooser.setFileFilter(filter);
         fileChooser.setAcceptAllFileFilterUsed(false);
 
@@ -885,16 +859,14 @@ public class GUI {
         fileChooser.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                    //if user clicks open
+                //if user clicks open
                 if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) {
                     //get selected file
                     File selectedFile = fileChooser.getSelectedFile();
-                    //create String array list of file "lines"
-                    List<String> lines = new ArrayList<>();
-                    //use fileLoader method from CoffeeMenu class to add file to coffeeTable
-                    coffeeMenu.fileLoader(selectedFile.getPath(), lines, coffeeMenu);
+                    String filePath = selectedFile.toString();
+                    connection = coffeeDB.connect(filePath);
                     //reload GUI to show table
-                    reload(parentFrame);
+                    refreshTable();
                     //close popup
                     fileDialog.dispose();
                     //if user clicks cancel
@@ -913,14 +885,14 @@ public class GUI {
 
     //method to start GUI and create JFrame of main window and adjust settings
     public void startGUI(JFrame frame) {
-    frame.setTitle("Coffee Menu Management System");
-    frame.setResizable(false);
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(1000,800);
-    frame.setLocationRelativeTo(null);
-    frame.setContentPane(startScreen(frame));
-    refreshTable();
-    frame.setVisible(true);
+        frame.setTitle("Coffee Menu Management System");
+        frame.setResizable(false);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1000,800);
+        frame.setLocationRelativeTo(null);
+        frame.setContentPane(startScreen(frame));
+        refreshTable();
+        frame.setVisible(true);
     }
 
     //method to 'reload' startScreen
@@ -1007,17 +979,7 @@ public class GUI {
                 int row = coffeeTable.getSelectedRow();
                 if (row != -1) {
                     String coffeeID = coffeeTable.getValueAt(row, 0).toString();
-
-                    Coffee selectedCoffee = null;
-                    for (Coffee c : coffeeMenu.coffees) {
-                        if (c.getDrinkID().equals(coffeeID)) {
-                            selectedCoffee = c;
-                            break;
-                        }
-                    }
-                    if (selectedCoffee != null) {
-                        coffeeMenu.deleteCoffee(selectedCoffee);
-                    }
+                    coffeeDB.deleteRow(coffeeID);
                 }
                 refreshTable();
             }
@@ -1056,13 +1018,7 @@ public class GUI {
                 String id = coffeeTable.getValueAt(selectedRow, 0).toString();
 
                 // Find matching Coffee object
-                Coffee selectedCoffee = null;
-                for (Coffee c : coffeeMenu.coffees) {
-                    if (c.getDrinkID().equals(id)) {
-                        selectedCoffee = c;
-                        break;
-                    }
-                }
+              Coffee selectedCoffee = coffeeDB.getCoffee(id);
 
                 // Open popup with selected coffee
                 if (selectedCoffee != null) {
@@ -1082,14 +1038,7 @@ public class GUI {
                 String id = coffeeTable.getValueAt(selectedRow, 0).toString();
 
                 // Find matching Coffee object
-                Coffee selectedCoffee = null;
-                for (Coffee c : coffeeMenu.coffees) {
-                    if (c.getDrinkID().equals(id)) {
-                        selectedCoffee = c;
-                        break;
-                    }
-                }
-
+                Coffee selectedCoffee = coffeeDB.getCoffee(id);
                 // Open popup with selected coffee
                 if (selectedCoffee != null) {
                     salePopup(frame, selectedCoffee);
@@ -1104,8 +1053,8 @@ public class GUI {
 
 
         //bottomPanel buttons (Load File & Exit)
-        JButton loadFileButton = new JButton("\uD83D\uDCC1 Load File ");
-        loadFileButton.setPreferredSize(buttonSize);
+        JButton loadFileButton = new JButton("\uD83D\uDCC1 Connect Database ");
+        loadFileButton.setPreferredSize(new Dimension(220, 50));
         loadFileButton.setFont(buttonFont);
         c.gridx = 0;
         c.gridy = 0;
@@ -1147,7 +1096,7 @@ public class GUI {
         });
 
         return panel;
-   }
+    }
 }
 
 
