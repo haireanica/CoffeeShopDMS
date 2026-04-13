@@ -6,9 +6,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * GUI class for the Coffee Menu Management System.
+ * This class handles the creation and management of all graphical user interface
+ * components, including the main window, tables, buttons, and popup dialogs.
+ * It allows users to interact with the coffee database and perform CRUD operations
+ * such as adding, updating, deleting, and applying sales to coffee items.
+ */
 public class GUI {
 
     //global variable to set styles
@@ -39,6 +44,12 @@ public class GUI {
     GridBagConstraints c = new GridBagConstraints();
 
     //method to reset constraints
+    /**
+     * Resets the GridBagConstraints object to default values.
+     *
+     * @param c the GridBagConstraints to reset
+     * @return the reset GridBagConstraints
+     */
     public GridBagConstraints cReset(GridBagConstraints c){
         c.gridx = 0;
         c.gridy = 0;
@@ -54,7 +65,11 @@ public class GUI {
         return c;
     }
 
-    //method to create JTable with coffee object data
+    /**
+     * Creates and formats the JTable used to display coffee data.
+     *
+     * @return the configured JTable
+     */
     public JTable makeTable(){
 
         coffeeTable = new JTable();
@@ -72,6 +87,9 @@ public class GUI {
         return coffeeTable;
     }
 
+    /**
+     * Refreshes the table with updated data from the database.
+     */
     //method to update/refresh table
     public void refreshTable() {
         if(connection != null) {
@@ -82,7 +100,11 @@ public class GUI {
         }
     }
 
-    //method to create add coffee popup window
+    /**
+     * Opens a popup dialog to add a new coffee item.
+     *
+     * @param parentFrame the parent frame for the dialog
+     */
     public void addPopup(JFrame parentFrame){
         JDialog addDialog = new JDialog(parentFrame, "Add Coffee", true);
         addDialog.setSize(500,400);
@@ -365,7 +387,12 @@ public class GUI {
 
         addDialog.setVisible(true);
     }
-    //method to create update popup window
+    /**
+     * Opens a popup dialog to update an existing coffee item.
+     *
+     * @param parentFrame the parent frame
+     * @param coffee the coffee to update
+     */
     public void updatePopup(JFrame parentFrame,Coffee coffee) {
         JDialog updateDialog = new JDialog(parentFrame, "Update Coffee", true);
         updateDialog.setSize(500,400);
@@ -670,7 +697,12 @@ public class GUI {
     }
 
 
-    //method to create sale popup window
+    /**
+     * Opens a popup dialog to apply a sale to a coffee item.
+     *
+     * @param parentFrame the parent frame
+     * @param coffee the selected coffee
+     */
     public void salePopup(JFrame parentFrame,Coffee coffee) {
         JDialog updateDialog = new JDialog(parentFrame, "Coffee Sale", true);
         updateDialog.setSize(500, 400);
@@ -840,7 +872,11 @@ public class GUI {
 
 
 
-    //method to create file loader popup window
+    /**
+     * Opens a file chooser dialog to connect to a database file.
+     *
+     * @param parentFrame the parent frame
+     */
     public void openFilePopup(JFrame parentFrame) {
 
         // Create the dialog
@@ -883,7 +919,11 @@ public class GUI {
         fileDialog.setVisible(true);
     }
 
-    //method to start GUI and create JFrame of main window and adjust settings
+    /**
+     * Initializes and displays the main application window.
+     *
+     * @param frame the main application frame
+     */
     public void startGUI(JFrame frame) {
         frame.setTitle("Coffee Menu Management System");
         frame.setResizable(false);
@@ -895,13 +935,22 @@ public class GUI {
         frame.setVisible(true);
     }
 
-    //method to 'reload' startScreen
+    /**
+     * Reloads the main screen of the application.
+     *
+     * @param frame the main application frame
+     */
     public void reload(JFrame frame) {
         frame.setContentPane(startScreen(frame));
         frame.revalidate();
         frame.repaint();
     }
-    //Main screen/panel of GUI
+    /**
+     * Builds and returns the main GUI layout.
+     *
+     * @param frame the main application frame
+     * @return the main container panel
+     */
     public Container startScreen(JFrame frame){
 
         JPanel panel = new JPanel();
@@ -948,7 +997,7 @@ public class GUI {
         panel.add(bottomPanel,c);
         cReset(c);
 
-        //Title Label ⋆˙⟡ ⟡˙⋆
+        //Title Label
         JLabel titleLabel = new JLabel(" ⋆˙⛥ Coffee⋆Menu⋆Wizard ⛥˙⋆");
         titleLabel.setForeground(new Color(255, 215, 0));
         titleLabel.setFont(titleFont);
@@ -1091,6 +1140,7 @@ public class GUI {
         exitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Goodbye");
+                coffeeDB.disconnect();
                 System.exit(0);
             }
         });

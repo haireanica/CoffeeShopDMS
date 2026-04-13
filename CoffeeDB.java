@@ -1,13 +1,24 @@
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
 
+/**
+ * CoffeeDB class: Handles all database operations for the Coffee Menu Management System.
+ * This class manages the connection to the SQLite database and provides
+ * methods to perform CRUD operations such as inserting, deleting, retrieving,
+ * and updating coffee data records.
+ */
 public class CoffeeDB {
     // url variable to store database filepath
     String url;
     //connection object to connect gui with database
     Connection connection;
 
-    //method that takes in a filepath to a .db and connects to the db
+    /**
+     * Establishes a connection to the SQLite database using the given file path.
+     * handles SQLException errors internally if connection fails
+     * @param dbFilePath the file path to the database
+     * @return the database connection object
+     */
     public Connection connect(String dbFilePath) {
         //database filepath
         url = "jdbc:sqlite:" + dbFilePath;
@@ -23,7 +34,10 @@ public class CoffeeDB {
         return connection;
     }
 
-    //method that disconnects from the db
+    /**
+     * Closes the current database connection.
+     *handles SQLException errors internally if disconnection fails
+     */
     public void disconnect() {
         try {
             if (connection != null) {
@@ -35,7 +49,12 @@ public class CoffeeDB {
         }
     }
 
-    //method to grab data from database and push to JTable
+    /**
+     * Retrieves all coffee records from the database and formats them
+     * into a DefaultTableModel for display in a JTable.
+     *
+     * @return a table model containing coffee data
+     */
     public DefaultTableModel selectCoffeeTable() {
         //query to select all from table and order by ID number
         String query = "SELECT * FROM Coffees ORDER BY DrinkID ASC";
@@ -71,8 +90,11 @@ public class CoffeeDB {
         return model;
     }
 
-    //method delete object data from db
-    public void deleteRow(String drinkID) {
+    /**
+     * Deletes a coffee record from the database based on its ID.
+     *
+     * @param drinkID the ID of the coffee to delete
+     */    public void deleteRow(String drinkID) {
         //sql query to delete object from table
         String toDelete = "DELETE FROM Coffees WHERE DrinkID = " + drinkID;
         try {
@@ -84,8 +106,12 @@ public class CoffeeDB {
         }
     }
 
-    //method to check if ID is duplicate
-    public boolean isDuplicate(String drinkID) {
+    /**
+     * Checks if a coffee with the given ID already exists in the database.
+     *handles SQLException errors internally if validation fails
+     * @param drinkID the ID to check
+     * @return true if the ID exists, false otherwise
+     */    public boolean isDuplicate(String drinkID) {
         //sql query to grab object from db
         String toCheck = "SELECT * FROM Coffees WHERE DrinkID = " + drinkID;
         //result set object to store queried information
@@ -109,8 +135,11 @@ public class CoffeeDB {
         return false;
     }
 
-    //method to add Object data to db
-    public void addRow(Coffee coffee) {
+    /**
+     * Inserts a new coffee record into the database.
+     *handles SQLException errors internally if insertion fails
+     * @param coffee the Coffee object containing data to insert
+     */    public void addRow(Coffee coffee) {
         //getting data from object and assigning to variables
         String DrinkID = coffee.getDrinkID();
         String Name = coffee.getName();
@@ -138,8 +167,12 @@ public class CoffeeDB {
         }
 
     }
-    //method to retrieve/query coffee object data from database
-    public Coffee getCoffee(String DrinkID) {
+    /**
+     * Retrieves a Coffee object from the database based on its ID.
+     *handles SQLException errors internally if query fails
+     * @param DrinkID the ID of the coffee to retrieve
+     * @return the corresponding Coffee object, or null if not found
+     */    public Coffee getCoffee(String DrinkID) {
         Coffee coffee =  null;
         //query to retrieve data
         String query = "SELECT * FROM Coffees WHERE DrinkID = " + DrinkID;
@@ -163,8 +196,12 @@ public class CoffeeDB {
         return coffee;
     }
 
-    //method to apply sale to coffee in database
-    public void dbSale(Coffee coffee,double percent) {
+    /**
+     * Applies a percentage discount to a coffee's price in the database.
+     *handles SQLException errors internally if query fails
+     * @param coffee the coffee to update
+     * @param percent the discount percentage to apply
+     */    public void dbSale(Coffee coffee,double percent) {
         double originalPrice = coffee.getPrice();
         // calculate new price after discount
         //calculating new price after sale applied

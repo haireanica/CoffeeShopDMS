@@ -1,9 +1,14 @@
-import java.io.File;
-import java.io.FileNotFoundException;
+
 import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
-
+/**
+ * Command Line Interface (CLI) for the Coffee Menu Management System.
+ *
+ * This class allows users to interact with the system through the console.
+ * It provides options to add, remove, update, list, and apply sales to coffees,
+ * as well as import coffee data from a file.
+ */
 public class CoffeeCLI {
     // ArrayList to store Coffee objects
     CoffeeMenu coffeeMenu = new CoffeeMenu();
@@ -11,7 +16,11 @@ public class CoffeeCLI {
     //Scanner to read input for user
     Scanner scanner = new Scanner(System.in);
 
-    //Method to display menu to user
+    /**
+     * Displays the menu options to the user.
+     *
+     * @return 0 after displaying the menu
+     */
     public int displayMenu() {
         System.out.println("---------------------------------------------------");
         System.out.println("\t***PLEASE SELECT A MENU OPTION BY NUMBER***");
@@ -25,7 +34,11 @@ public class CoffeeCLI {
         System.out.println("7. EXIT MENU");
         return 0;
     }
-    //menu method with methods to correspond to display menu
+    /**
+     * Runs the main menu loop and handles user input.
+     *handles NumberFormatException errors internally if data is invalid
+     * @return 0 when the program exits
+     */
     public int Menu() {
         //variable to store user choice input
         int choice = 0;
@@ -76,7 +89,11 @@ public class CoffeeCLI {
     }
 
 
-    //Method to add Coffee manually
+    /**
+     * Prompts the user to manually enter coffee details and adds it to the menu.
+     *handles NumberFormatException errors internally if data is invalid
+     * @return 0 after completion
+     */
     public int addCoffeeCLI() {
         String DrinkID;
         String Name;
@@ -242,7 +259,11 @@ public class CoffeeCLI {
     }
 
 
-    //method to add coffee(s) from text file and add to system/list
+    /**
+     * Prompts the user for a file path and loads coffee data from a text file.
+     *
+     * @return 0 after completion
+     */
     public int addCoffeeFileCLI() {
         while (true) {
             System.out.println("Please enter filepath of file to import (.txt) or 'Q' to quit: ");
@@ -266,7 +287,11 @@ public class CoffeeCLI {
     }
 
 
-    // method to remove coffee by DrinkID number
+    /**
+     * Prompts the user to remove a coffee by its Drink ID.
+     *
+     * @return 0 after completion
+     */
     public int removeCoffeeCLI() {
         while (true) {
             System.out.print("To delete a coffee, please enter valid 7-Digit Drink ID #, OR if you would like to exit enter 'Q': ");
@@ -303,7 +328,11 @@ public class CoffeeCLI {
         return 0;
     }
 
-    //custom method to calculate drink sale price and update object price
+    /**
+     * Prompts the user to apply a discount to a selected coffee.
+     *handles NumberFormatException errors internally if invalid sale
+     * @return 0 if successful, 1 if no coffees exist or ID not found
+     */
     public int onSaleCLI () {
         if (coffeeMenu.getMenu().isEmpty()) {
             System.out.println("No coffees in the system to put on sale.");
@@ -349,7 +378,11 @@ public class CoffeeCLI {
     }
 
 
-    // method to select coffee drink by DrinkID and update attribute data
+    /**
+     * Allows the user to update attributes of an existing coffee.
+     *handles NumberFormatException errors internally if invalid update data
+     * @return 0 if successful, 1 if no coffees exist or ID not found
+     */
     public int updateCoffeeCLI() {
         if (coffeeMenu.getMenu().isEmpty()) {
             System.out.println("No coffees in the system to update.");
@@ -466,7 +499,11 @@ public class CoffeeCLI {
         ListCoffeesCLI();
         return 0;
     }
-    //method to print/display all coffees to console
+    /**
+     * Displays all coffees currently in the system.
+     *
+     * @return 0 after displaying the list
+     */
     public int ListCoffeesCLI() {
         System.out.println("----------ALL COFFEES CURRENTLY IN SYSTEM----------");
         coffeeMenu.printMenu();

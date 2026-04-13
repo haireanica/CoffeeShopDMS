@@ -1,9 +1,16 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
-
+/**
+ * CoffeeMenu class: Represents a menu of Coffee objects.
+ *
+ * This class manages a collection of coffees and provides methods to
+ * add, delete, update, and retrieve coffee items. additional functionality includes
+ * loading data from files and applying discounts.
+ */
 public class CoffeeMenu {
     // this ArrayList will store all the coffee objects in the menu
     public ArrayList<Coffee> coffees;
@@ -13,8 +20,12 @@ public class CoffeeMenu {
         coffees = new ArrayList<>();
     }
 
-    // method to add a coffee to the menu
-    public boolean addCoffee(Coffee coffee){
+    /**
+     * Adds a coffee to the menu after checking it is valid and not a duplicate.
+     *
+     * @param coffee the Coffee object to add
+     * @return true if successfully added, false otherwise
+     */    public boolean addCoffee(Coffee coffee){
         // if the coffee object is null, don’t add it
         if (coffee == null) {
             return false;
@@ -33,8 +44,12 @@ public class CoffeeMenu {
         // return true if successfully added
         return true;
     }
-
-    // method to delete a coffee from the menu
+    /**
+     * Removes a coffee from the menu.
+     *
+     * @param coffee the Coffee to remove
+     * @return true if removed successfully, false otherwise
+     */
     public boolean deleteCoffee(Coffee coffee){
         // if the coffee is null, nothing to delete
         if (coffee == null) {
@@ -48,8 +63,11 @@ public class CoffeeMenu {
         }
     }
 
-    // method to print all coffees in the menu
-    public int printMenu(){
+    /**
+     * Prints all coffees in the menu to the console.
+     *
+     * @return 0 if printed successfully, 1 if the menu is empty
+     */    public int printMenu(){
         // if the list is empty, print message
         if (coffees.isEmpty()){
             System.out.println("Coffee Menu is empty.");
@@ -64,7 +82,13 @@ public class CoffeeMenu {
         return 0;
     }
 
-    // update the drink ID of a coffee
+    /**
+     * Updates the drink ID of a coffee.
+     *
+     * @param coffee the coffee to update
+     * @param newDrinkID the new drink ID
+     * @return true if updated successfully, false otherwise
+     */
     public boolean updateDrinkID(Coffee coffee, String newDrinkID){
         // check if coffee is null
         if (coffee == null) {
@@ -78,7 +102,13 @@ public class CoffeeMenu {
         }
     }
 
-    // update the name of a coffee
+    /**
+     * Updates the name of a coffee.
+     *
+     * @param coffee the coffee to update
+     * @param newName the new name
+     * @return true if updated successfully, false otherwise
+     */
     public boolean updateName(Coffee coffee, String newName){
         // check if coffee is null
         if (coffee == null) {
@@ -94,7 +124,13 @@ public class CoffeeMenu {
         }
     }
 
-    // update the size of a coffee
+    /**
+     * Updates the size of a coffee.
+     *
+     * @param coffee the coffee to update
+     * @param newSize the new size
+     * @return true if updated successfully, false otherwise
+     */
     public boolean updateSize(Coffee coffee, String newSize){
         // check if coffee is null
         if (coffee == null) {
@@ -108,7 +144,13 @@ public class CoffeeMenu {
         }
     }
 
-    // update the price of a coffee
+    /**
+     * Updates the price of a coffee.
+     *
+     * @param coffee the coffee to update
+     * @param newPrice the new price
+     * @return true if updated successfully, false otherwise
+     */
     public boolean updatePrice(Coffee coffee, double newPrice){
         // check if coffee is null
         if (coffee == null) {
@@ -122,7 +164,13 @@ public class CoffeeMenu {
         }
     }
 
-    // update the calories of a coffee
+    /**
+     * Updates the calorie count of a coffee.
+     *
+     * @param coffee the coffee to update
+     * @param newCalories the new calorie value
+     * @return true if updated successfully, false otherwise
+     */
     public boolean updateCalories(Coffee coffee, int newCalories){
         // check if coffee is null
         if (coffee == null) {
@@ -138,7 +186,13 @@ public class CoffeeMenu {
         }
     }
 
-    // update if the coffee has dairy
+    /**
+     * Updates whether a coffee contains dairy.
+     *
+     * @param coffee the coffee to update
+     * @param newDairy the new dairy value
+     * @return true if updated successfully, false otherwise
+     */
     public boolean updateDairy(Coffee coffee, boolean newDairy){
         // check if coffee is null
         if (coffee == null) {
@@ -150,7 +204,13 @@ public class CoffeeMenu {
         }
     }
 
-    // update if the coffee is decaf
+    /**
+     * Updates whether a coffee is decaffeinated.
+     *
+     * @param coffee the coffee to update
+     * @param newDecaf the new decaf value
+     * @return true if updated successfully, false otherwise
+     */
     public boolean updateDecaf(Coffee coffee, boolean newDecaf){
         // check if coffee is null
         if (coffee == null) {
@@ -162,7 +222,17 @@ public class CoffeeMenu {
         }
     }
 
-    // method to load coffees from a file
+    /**
+     * Loads coffee data from a file and adds valid entries to the menu.
+     * Handles file errors internally if the file cannot be read.
+     * handles NumberFormatException errors internally if data is invalid
+     *
+     * @param filepath the path to the file
+     * @param lines list to store file lines
+     * @param coffeeMenu the menu to add coffees to
+     * @return the number of coffees successfully added
+     *
+     */
     public int fileLoader(String filepath, List<String> lines, CoffeeMenu coffeeMenu) {
         // keeps track of how many valid coffees were added
         int newCoffees = 0;
@@ -275,7 +345,12 @@ public class CoffeeMenu {
         return newCoffees;
     }
 
-    // method to check if an ID already exists in the menu
+    /**
+     * Checks if a coffee ID already exists in the menu.
+     *
+     * @param id the ID to check
+     * @return true if the ID exists, false otherwise
+     */
     public boolean CheckID(String id) {
         // loop through all coffees
         for (Coffee c : coffees) {
@@ -288,12 +363,22 @@ public class CoffeeMenu {
         return false;
     }
 
-    // returns the full list of coffees
+    /**
+     * Returns the list of coffees in the menu.
+     *
+     * @return the list of coffees
+     */
     public List<Coffee> getMenu(){
         return coffees;
     }
 
-    // method to apply a discount to a selected coffee
+    /**
+     * Applies a discount to a coffee and updates its price.
+     *
+     * @param selected the coffee to apply the discount to
+     * @param discount the discount percentage
+     * @return the new price after discount
+     */
     public double onSale(Coffee selected, double discount) {
         // get the original price
         double originalPrice = selected.getPrice();
